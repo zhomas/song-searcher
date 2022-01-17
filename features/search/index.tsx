@@ -2,11 +2,7 @@ import React, { useState, FC, useEffect, useLayoutEffect } from "react";
 import styles from "./search.module.css";
 import { useDispatch } from "react-redux";
 import { useAppDispatch, useAppSelector } from "../../app/store";
-import {
-  searchForTerm,
-  searchMore,
-  searchResultsSelector,
-} from "./search.slice";
+import { searchForTerm, searchMore, searchResultsSelector } from "./search.slice";
 import { useInView } from "react-intersection-observer";
 
 export const Search: FC = () => {
@@ -23,23 +19,21 @@ export const Search: FC = () => {
   };
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const action = searchForTerm(searchTerm);
+    dispatch(action);
     e.preventDefault();
-    dispatch(searchForTerm(searchTerm));
   };
 
   useLayoutEffect(() => {
     if (inView) {
-      dispatch(searchMore());
+      const action = searchMore();
+      dispatch(action);
     }
   }, [inView]);
 
   const renderContent = () => {
     if (results.status === "welcome") {
       return <span>Welcome! Try searching for your favourite band.</span>;
-    }
-
-    if (results.status === "loading") {
-      return <span>Loading...</span>;
     }
 
     if (results.status === "none") {
@@ -63,7 +57,7 @@ export const Search: FC = () => {
           ref={ref}
           className={styles.loader}
           style={{
-            visibility: results.status === "loadingMore" ? "visible" : "hidden",
+            visibility: results.status === "loading" ? "visible" : "hidden",
           }}
         >
           Loading...
@@ -75,12 +69,7 @@ export const Search: FC = () => {
   return (
     <div>
       <form onSubmit={onSubmit} className={styles.searchBar}>
-        <input
-          value={searchTerm}
-          onChange={onChange}
-          type="search"
-          placeholder={"Search"}
-        />
+        <input value={searchTerm} onChange={onChange} type="search" placeholder={"Search"} />
         <button type={"submit"}>Go</button>
       </form>
       <div className={styles.content}>{renderContent()}</div>

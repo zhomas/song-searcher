@@ -17,12 +17,10 @@ const initialState: SearchState = {
   results: [],
 };
 
-type SearchResults =
-  | { status: "welcome" }
-  | { status: "none" }
-  | { status: "loading" }
-  | { status: "loadingMore"; results: ITunesResponse[] }
-  | { status: "list"; results: ITunesResponse[] };
+type SearchResults = {
+  status: "welcome" | "none" | "loading" | "ready";
+  results: ITunesResponse[];
+};
 
 const searchSlice = createSlice({
   name: "search",
@@ -93,20 +91,20 @@ export const searchMore = createAppThunk(
 );
 
 export const searchResultsSelector = (state: RootState): SearchResults => {
-  if (!state.searchTerm) return { status: "welcome" };
-  if (state.pendingAPIRequests > 0) {
-    if (state.results.length > 0)
-      return {
-        status: "loadingMore",
-        results: state.results,
-      };
-
-    return { status: "loading" };
+  if (!state.searchTerm) {
+    return { status: "welcome", results: [] };
   }
-  if (!state.results.length) return { status: "none" };
+
+  if (state.results.length > 0) {
+    return {
+      status: state.pendingAPIRequests > 0 ? "loading" : "ready",
+      results: state.results,
+    };
+  }
+
   return {
-    status: "list",
-    results: state.results,
+    status: state.pendingAPIRequests > 0 ? "loading" : "none",
+    results: [],
   };
 };
 
