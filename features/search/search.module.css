@@ -1,0 +1,34 @@
+.searchBar {
+  position: sticky;
+  top: 0;
+  padding: 20px 10vw;
+  border-bottom: 1px solid lightgrey;
+  display: flex;
+}
+
+.searchBar input {
+  flex: 1;
+  margin-right: 8px;
+}
+
+.results {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  padding: 8px;
+  grid-gap: 8px;
+}
+
+.result {
+  text-align: left;
+  background: darkgoldenrod;
+  padding: 24px;
+  margin: 2px 0;
+  display: flex;
+}
+
+.result__content {
+  flex: 1;
+}
+
+.result__img {
+}

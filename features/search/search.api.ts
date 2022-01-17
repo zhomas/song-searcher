@@ -14,7 +14,7 @@ interface SearchRequest extends NextApiRequest {
 export interface ITunesResponse {
   artistName: string;
   trackName: string;
-  artworkURL: string;
+  artworkUrl100: string;
 }
 
 export type SearchResponse = {
