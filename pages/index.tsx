@@ -15,7 +15,7 @@ const Home: NextPage = () => {
         <meta name="description" content="iTunes Search" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <h1 className={styles.pageHeading}>ITunes Search</h1>
+      <h1 className={styles.pageHeading}>iTunes Search</h1>
       <Search />
     </>
   );

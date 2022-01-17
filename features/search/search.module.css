@@ -1,29 +1,45 @@
 .searchBar {
   position: sticky;
-  top: 0;
+  top: -1px;
   padding: 20px 10vw;
-  border-bottom: 1px solid lightgrey;
+  border-bottom: 1px solid #414548;
   display: flex;
+  background: #21272c;
 }
 
 .searchBar input {
-  flex: 1;
+  flex: 1 1;
   margin-right: 8px;
+  padding: 10px;
+  font-size: 22px;
+  border-radius: 4px;
+  border: 1px solid #414548;
+}
+
+.searchBar button {
+  min-width: 100px;
+  border: 1px solid #414548;
+  border-radius: 4px;
+}
+
+.content {
+  padding: 48px;
 }
 
 .results {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  padding: 8px;
   grid-gap: 8px;
 }
 
 .result {
   text-align: left;
-  background: darkgoldenrod;
+  background: white;
+  border: 1px solid #ccc;
   padding: 24px;
   margin: 2px 0;
   display: flex;
+  border-radius: 4px;
 }
 
 .result__content {
@@ -31,4 +47,11 @@
 }
 
 .result__img {
+  display: block;
+  width: 100px;
+  height: 100px;
+}
+
+.loader {
+  padding: 20px;
 }

@@ -1,17 +1,22 @@
-import React, { useState, FC } from "react";
+import React, { useState, FC, useEffect, useLayoutEffect } from "react";
 import styles from "./search.module.css";
 import { useDispatch } from "react-redux";
 import { useAppDispatch, useAppSelector } from "../../app/store";
-import { searchForTerm, searchResultsSelector } from "./search.slice";
+import {
+  searchForTerm,
+  searchMore,
+  searchResultsSelector,
+} from "./search.slice";
+import { useInView } from "react-intersection-observer";
 
 export const Search: FC = () => {
   const dispatch = useAppDispatch();
   const results = useAppSelector(searchResultsSelector);
   const [searchTerm, setSearchTerm] = useState("the beatles");
 
-  const runSearch = () => {
-    dispatch(searchForTerm("sting and shaggy"));
-  };
+  const { ref, inView } = useInView({
+    threshold: 0.1,
+  });
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -22,13 +27,15 @@ export const Search: FC = () => {
     dispatch(searchForTerm(searchTerm));
   };
 
+  useLayoutEffect(() => {
+    if (inView) {
+      dispatch(searchMore());
+    }
+  }, [inView]);
+
   const renderContent = () => {
     if (results.status === "welcome") {
-      return (
-        <>
-          <span>Welcome!</span>
-        </>
-      );
+      return <span>Welcome! Try searching for your favourite band.</span>;
     }
 
     if (results.status === "loading") {
@@ -36,21 +43,32 @@ export const Search: FC = () => {
     }
 
     if (results.status === "none") {
-      return <span>No results for that search.</span>;
+      return <span>Sorry, no results found.</span>;
     }
 
     return (
-      <div className={styles.results}>
-        {results.results.map((result) => (
-          <div className={styles.result}>
-            <div className={styles.result__content}>
-              <h4>{result.trackName}</h4>
-              <h5>{result.artistName}</h5>
+      <>
+        <div className={styles.results}>
+          {results.results.map((result) => (
+            <div className={styles.result}>
+              <div className={styles.result__content}>
+                <h4>{result.trackName}</h4>
+                <h5>{result.artistName}</h5>
+              </div>
+              <img className={styles.result__img} src={result.artworkUrl100} />
             </div>
-            <img src={result.artworkUrl100} />
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+        <div
+          ref={ref}
+          className={styles.loader}
+          style={{
+            visibility: results.status === "loadingMore" ? "visible" : "hidden",
+          }}
+        >
+          Loading...
+        </div>
+      </>
     );
   };
 

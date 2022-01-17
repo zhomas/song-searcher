@@ -19,8 +19,9 @@ const initialState: SearchState = {
 
 type SearchResults =
   | { status: "welcome" }
-  | { status: "loading" }
   | { status: "none" }
+  | { status: "loading" }
+  | { status: "loadingMore"; results: ITunesResponse[] }
   | { status: "list"; results: ITunesResponse[] };
 
 const searchSlice = createSlice({
@@ -45,6 +46,20 @@ const searchSlice = createSlice({
       state.pendingAPIRequests--;
       state.results = [];
     });
+
+    builder.addCase(searchMore.pending, (state, action) => {
+      state.pendingAPIRequests++;
+    });
+
+    builder.addCase(searchMore.fulfilled, (state, action) => {
+      state.pendingAPIRequests--;
+      state.page++;
+      state.results.push(...action.payload.results);
+    });
+
+    builder.addCase(searchMore.rejected, (state, action) => {
+      state.pendingAPIRequests--;
+    });
   },
 });
 
@@ -60,9 +75,34 @@ export const searchForTerm = createAppThunk(
   }
 );
 
+export const searchMore = createAppThunk(
+  "search/more",
+  async (_, { getState, rejectWithValue }) => {
+    const { searchTerm, page, pendingAPIRequests } = getState();
+
+    if (pendingAPIRequests > 1) {
+      return rejectWithValue("already searching");
+    }
+
+    const response = await axios.get<SearchResponse>(`api/search`, {
+      params: { term: searchTerm, page },
+    });
+
+    return response.data;
+  }
+);
+
 export const searchResultsSelector = (state: RootState): SearchResults => {
   if (!state.searchTerm) return { status: "welcome" };
-  if (state.pendingAPIRequests > 0) return { status: "loading" };
+  if (state.pendingAPIRequests > 0) {
+    if (state.results.length > 0)
+      return {
+        status: "loadingMore",
+        results: state.results,
+      };
+
+    return { status: "loading" };
+  }
   if (!state.results.length) return { status: "none" };
   return {
     status: "list",
